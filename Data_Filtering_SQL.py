@@ -40,9 +40,9 @@ def Dominant_future(df):
     new_price_info = pd.DataFrame(columns=['time', 'symbol', 'Current_price', 'Past_price', 'C-P'])
     #print(new_price_table)
 
-    time_lst = df1.index.unique()  # 所有的时间段
+    time_lst = df1.index.unique()  
     # max_accum_contract=df.iloc[index]
-    # 循环时间序列
+
     for index in range(len(time_lst)):
 
         max_accum_contract = df1.iloc[index]
