@@ -22,7 +22,7 @@ def connectSQL(symbol,fromdate,todate,cur):
     array=np.array(row)
     Data=pd.DataFrame(array)
     Data.rename(columns={col: col_name for col, col_name in enumerate(index_list)}, inplace=True)
-    # Data.set_index('time', inplace=True) #不把时间设成索引的话，resample会出错
+    # Data.set_index('time', inplace=True) 
     Data.set_index('date', inplace=True)
     # print(Data)
     return Data
