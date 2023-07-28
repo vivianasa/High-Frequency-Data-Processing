@@ -78,7 +78,7 @@ def  staRoll(df,Product):
     for i in range(0,len(Product)):
         df1=df.loc[df['symbol'] == Product[i]]
         print(df1)
-        list = df1['Gross_return'].values.tolist()  # 方法2df['a'].tolist()
+        list = df1['Gross_return'].values.tolist() 
         print(list)
         basicStatsRolling.loc[i,'Symbol']=Product[i]
         basicStatsRolling.loc[i,'Maximum'] = np.max(list)
@@ -86,7 +86,7 @@ def  staRoll(df,Product):
         basicStatsRolling.loc[i,'Mean'] = np.mean(list)
         basicStatsRolling.loc[i,'Std'] = np.std(list)
         basicStatsRolling.loc[i,'median'] = np.median(list)
-        basicStatsRolling.loc[i,'skewness'] =  stats.skew(list)  #为什么不写np 就直接在原来的df后面加两列
+        basicStatsRolling.loc[i,'skewness'] =  stats.skew(list)  
         basicStatsRolling.loc[i,'kurtosis'] = stats.kurtosis(list)
 
 
