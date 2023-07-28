@@ -73,7 +73,7 @@ def   sqlC_P(strtime1,strtime2,symbol):
 
 def benchmark(df):
     current_Past_bench = pd.DataFrame(np.zeros((len(df), 5)), columns=['time', 'PL_bench', 'Portfolio PL_bench', 'NAV_bench', 'return_bench'])
-    for i in range(0,len(df)):  #行数
+    for i in range(0,len(df)):  
 
 
         if(i==0):
@@ -95,7 +95,7 @@ def benchmark(df):
 
 
 
-    print(current_Past_bench)   #再核对一下
+    print(current_Past_bench)   
     current_Past_bench = current_Past_bench.drop(current_Past_bench[current_Past_bench['time'] == 0].index)
     current_Past_bench.to_csv("RETURN_benchmark.csv")
 
@@ -107,14 +107,14 @@ def benchmark(df):
 
 def current_Past(df,cur):  #find C and P   profit and loss
 
-    current_Past = pd.DataFrame(np.zeros((len(df), 5)), columns=['time','PL','Portfolio PL','NAV','return'])  #初始设置df不用体现总行数
+    current_Past = pd.DataFrame(np.zeros((len(df), 5)), columns=['time','PL','Portfolio PL','NAV','return'])  
 
 
-    for i in range(0,len(df)):  #行数
+    for i in range(0,len(df)): 
 
 
         if(i==0):
-            current_Past.loc[0, 'Portfolio PL'] = 1000000  #本金 two places
+            current_Past.loc[0, 'Portfolio PL'] = 1000000  
             current_Past.loc[0, 'NAV'] = 1
             current_Past.loc[0, 'return'] = ''
             strtime = df.iloc[i, 0]
@@ -142,12 +142,12 @@ def current_Past(df,cur):  #find C and P   profit and loss
             current_Past.loc[i, 'PL'] = profit_loss_sum
             current_Past.loc[i, 'time'] = strtime2
 
-            current_Past.loc[i,'Portfolio PL']=current_Past.loc[i-1,'Portfolio PL']+current_Past.loc[i, 'PL']   #累加
+            current_Past.loc[i,'Portfolio PL']=current_Past.loc[i-1,'Portfolio PL']+current_Past.loc[i, 'PL']  
             current_Past.loc[i,'NAV']=current_Past.loc[i,'Portfolio PL']/1000000#df2.loc[i]['return']
             current_Past.loc[i,'return']=(current_Past.loc[i,'NAV'] -current_Past.loc[i-1,'NAV'] )/current_Past.loc[i-1,'NAV']
 
 
-    print(current_Past)   #再核对一下
+    print(current_Past)   
     current_Past = current_Past.drop(current_Past[current_Past['time'] == 0].index)
     df4 = pd.merge(current_Past, df, on=('time'),how='right')
     df4.to_csv("RETURN_ALL.csv")
@@ -166,30 +166,22 @@ def concat_bench_mom(df_ben,df_mom):
 
 
 def MaxDrawdown(return_list):
-    '''最大回撤率'''
-    i = np.argmax((np.maximum.accumulate(return_list) - return_list) / np.maximum.accumulate(return_list))  # 结束位置
+   
+    i = np.argmax((np.maximum.accumulate(return_list) - return_list) / np.maximum.accumulate(return_list))  
     if i == 0:
         return 0
-    j = np.argmax(return_list[:i])  # 开始位置
+    j = np.argmax(return_list[:i]) 
     return (return_list[j] - return_list[i]) / (return_list[j])
 
 
 def sharpe_ratio(return_series, N, rf):
-    '''
-    numpy: 默认--->总体标准偏差，ddof = 0     pandas 默认--->计算的是样本标准偏差，ddof = 1
-    传入为周频数据
-    计算年化
-    '''
+   
     mean = return_series.mean() * N -rf
     sigma = return_series.std(ddof = 1) * np.sqrt(N)
     return   mean / sigma
 
 def sortino_ratio(series, N,rf):
-    '''
-    numpy: 默认--->总体标准偏差，ddof = 0     pandas 默认--->计算的是样本标准偏差，ddof = 1
-    传入为周频数据
-    计算年化
-    '''
+    
     mean = series.mean() * N -rf
     std_neg = series[series<0].std(ddof = 1)*np.sqrt(N)
     return mean/std_neg
@@ -217,8 +209,8 @@ def var_gaussian(r, level, modified):
 def  staRoll(df):
     df = df.drop(df[df['return'] == ''].index)  #drop the null(first one)
     list_w = df['return'].tolist()
-    df1=df['return']*52               #年化return     df1 has no index so cannot callout by df1['return']
-    df = df.drop(df[df['NAV'] == ''].index)      # 最大回撤要有nav计算
+    df1=df['return']*52              
+    df = df.drop(df[df['NAV'] == ''].index)     
     list_y = df1.values.tolist()
     list1 = df['NAV'].values.tolist()
 
@@ -233,17 +225,17 @@ def  staRoll(df):
                                        index=['MOM4/2',])
     basicStatsRolling['Maximum'] = df1.max()
     basicStatsRolling['Minimum'] = df1.min()
-    basicStatsRolling['Mean'] = df1.mean()   #年化
-    basicStatsRolling['Std'] = df1.std(ddof = 1)/math.sqrt(52)    #年化   再除以根号52才对
-    basicStatsRolling['skewness'] =  df1.skew(axis = 0)  #年化  无偏估计
-    basicStatsRolling['kurtosis'] = df1.kurt()   #年化  无偏估计
+    basicStatsRolling['Mean'] = df1.mean()   
+    basicStatsRolling['Std'] = df1.std(ddof = 1)/math.sqrt(52)   
+    basicStatsRolling['skewness'] =  df1.skew(axis = 0)  
+    basicStatsRolling['kurtosis'] = df1.kurt()   
     rf=0.025
     A_r=df1.mean()
     Volatility=df1.std(ddof = 1)/math.sqrt(52)
 
 
 
-    Max_drawdown=MaxDrawdown(list1)  #用Nav计算的
+    Max_drawdown=MaxDrawdown(list1)  
     SP_R= sharpe_ratio(df['return'], 52, 0)
     SP = sharpe_ratio(df['return'], 52, rf)
     SO=sortino_ratio(df['return'], 52, rf)
@@ -263,16 +255,16 @@ def  staRoll(df):
     else:
         basicStatsRolling['momentum'] = 'Yes**'
 
-    Performance_measure['Annualized return'] = A_r    #年化
+    Performance_measure['Annualized return'] = A_r   
     Performance_measure['t-value']=t
-    Performance_measure['Volatility'] = Volatility     #年化
-    Performance_measure['skewness'] =  df1.skew(axis = 0)  #年化  无偏估计
-    Performance_measure['kurtosis'] = df1.kurt()   #年化  无偏估计
+    Performance_measure['Volatility'] = Volatility     
+    Performance_measure['skewness'] =  df1.skew(axis = 0)  
+    Performance_measure['kurtosis'] = df1.kurt()   
     Performance_measure['Max drawdown'] = Max_drawdown
     Performance_measure['Reward-to-risk ratio'] = SP_R
     Performance_measure['Sharpe ratio'] = SP
     Performance_measure['Sortino'] = SO
-    Performance_measure['95% VaR']=norm.ppf(0.95, A_r, Volatility)   #按时间区间的VaR
+    Performance_measure['95% VaR']=norm.ppf(0.95, A_r, Volatility)   
     Performance_measure['99% VaR (Cornish–Fisher) '] = VaR_cf
 
 ####################   result    ##############################
@@ -320,12 +312,12 @@ buy_sell = pd.DataFrame(np.zeros((1, 4)), columns=['buy1', 'buy2', 'sell1','sell
 basicStats1 = pd.DataFrame(np.zeros((1, 4)), columns=['Maximum', 'Minimum', 'Mean', 'Std'],
                            index=['MOM12/4'])
 hypothesis1 = pd.DataFrame(np.zeros((1, 6)), columns=['time','mean', 'std', 't-statistic', 'p-value', 'momentum'],
-                           index=['MOM12/4'])           #time是holding结束的日期
+                           index=['MOM12/4'])           
 
 df = weekReading()
 hypothesis2 = pd.DataFrame()
 for i in range(9, len(df) - 2, 2):  # F   1  H 5
-    # H 目前相隔天数还不是很确定 需要进一步商榷
+   
     strtime = str(df.iloc[i - 2])[0:10]
     strtime1 = str(df.iloc[i])[0:10]   #holding start
     strtime2 = str(df.iloc[i])[0:10]
@@ -336,14 +328,13 @@ for i in range(9, len(df) - 2, 2):  # F   1  H 5
     df_avg7 = pd.DataFrame(runsqlcommand(sql1, cur), columns=['symbol', 'log_return'])
 
     if(hypothesis1.values[-1,-1]==0 or hypothesis1.values[-1,-1]=='Yes*'or  hypothesis1.values[-1,-1]=='Yes**'):
-#如果是刚开始或者动量测试通过 则重新选择产品   hypothesis1.values[-1,-1]==0 最后一行最后一列
-        buy, sell = getBuyandSell(df_avg7)  #Yes的时候 换symbol--交易
-        buy1 = calAvgLogr(strtime2, strtime3, buy[0], cur)
+  hypothesis1.values[-1,-1]==0 
+        buy, sell = getBuyandSell(df_avg7)  
         buy2 = calAvgLogr(strtime2, strtime3, buy[1], cur)
         sell1 = calAvgLogr(strtime2, strtime3, sell[0], cur)
         sell2 = calAvgLogr(strtime2, strtime3, sell[1], cur)
 
-    else:  #no  保持不变 还是上一次的产品 一直到no再改变
+    else:  
 
         buy1 = calAvgLogr(strtime2, strtime3, buy_sell.iloc[-1, 0], cur)  #if  No then hold until Yes 所以symbol还是原来的symbol
         buy2 = calAvgLogr(strtime2, strtime3, buy_sell.iloc[-1, 1], cur)
@@ -357,7 +348,7 @@ for i in range(9, len(df) - 2, 2):  # F   1  H 5
     momentum['winners'] = (buy1 + buy2) * 0.5
     momentum['losers'] = (sell1 + sell2) * 0.5
     momentum['momentum'] = (buy1 + buy2) * 0.5 - (sell1 + sell2) * 0.5  # equally weighted
-    # momentum['momentum'] = -(buy1 + buy2) * 0.5 + (sell1 + sell2) * 0.5   反转
+    # momentum['momentum'] = -(buy1 + buy2) * 0.5 + (sell1 + sell2) * 0.5  
     print(momentum)
     print(momentum['momentum'].values)
     #
@@ -403,9 +394,9 @@ for i in range(9, len(df) - 2, 2):  # F   1  H 5
     else:
         df1['momentum'] = 'Yes**'
     print(strtime1)
-    hypothesis1 = hypothesis1.append(df1, ignore_index=True)  #每次循环在最末端添加一列新的  如果用concat是从第一行加
+    hypothesis1 = hypothesis1.append(df1, ignore_index=True)  
     array = momentum['momentum'].values
-    return_week.extend(array)  #list添加
+    return_week.extend(array)  
     hypothesis2 = pd.concat([hypothesis1, buy_sell], axis=1)
     hypothesis2 = hypothesis2.drop(hypothesis2[hypothesis2['time'] == 0].index)
 
@@ -418,7 +409,7 @@ csv_df = pd.DataFrame(csv_data)
 csv_df.set_index(csv_df.iloc[:, 0], inplace=True)
 csv_df.index = pd.to_datetime(csv_df.index)  # turn index into timeindex for rasampling
 
-CSI_df = data_resample('W-Fri', csv_df)  #######指数的
+CSI_df = data_resample('W-Fri', csv_df) 
 
 
 
@@ -484,7 +475,7 @@ hypothesis2.to_csv("NAV_1920all.csv")
         ),
             title_opts=opts.TitleOpts(
 
-        # 标题文本使用 \n 换行
+        
         title='Net asset value',
        # subtitle='contrarian ',
                 pos_top='bottom',
@@ -543,7 +534,7 @@ hypothesis2.to_csv("NAV_1920all.csv")
 #         ),
 #             title_opts=opts.TitleOpts(
 #
-#         # 标题文本使用 \n 换行
+#         
 #         title='NAV_All excl. financial ',
 #         subtitle='momentum',
 #         #pos_top=30,
